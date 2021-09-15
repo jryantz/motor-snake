@@ -25,7 +25,7 @@ class Coord:
         self.left = (self.x - 1, self.y)
         self.right = (self.x + 1, self.y)
     
-    def as_tuple(self) -> Tuple:
+    def as_tuple(self) -> tuple:
         return (self.x, self.y)
 
 class Board:
@@ -41,7 +41,7 @@ class Board:
 class Snake:
     def __init__(self, data):
         self.head = Coord(data['head'])
-        self.body = Tuple(Coord(c) for c in data['body'])
+        self.body = tuple(Coord(c) for c in data['body'])
 
 def neck_direction(head: Coord, body: Tuple[Coord]):
     neck = body[1].as_tuple()
@@ -146,7 +146,7 @@ def choose_move(data: dict) -> str:
 
     # TODO: Using information from 'data', make your Battlesnake move towards a piece of food on the board.
     
-    move = random.choice(List(available_moves))
+    move = random.choice(list(available_moves))
 
     # TODO: Explore new strategies for picking a move that are better than random.
 
