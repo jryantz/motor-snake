@@ -10,9 +10,169 @@ in the folder where this file exists:
     python tests.py -v
 
 """
+
 import unittest
 
-from server_logic import POSSIBLE_MOVES, choose_move
+from server_logic import POSSIBLE_MOVES, UP, DOWN, LEFT, RIGHT, Coord, Board
+from server_logic import neck_direction, top_edge, bottom_edge, left_edge, right_edge, entire_body, choose_move
+
+class AvoidNeckTest(unittest.TestCase):
+    def test_neck_at_starting_position(self):
+        # Arrange
+        test_head = Coord({"x": 5, "y": 5})
+        test_body = tuple(Coord(p) for p in [{"x": 5, "y": 5}, {"x": 5, "y": 5}, {"x": 5, "y": 5}])
+
+        # Act
+        result_move = neck_direction(test_head, test_body)
+
+        # Assert
+        self.assertEqual(result_move, None)
+
+    def test_neck_left(self):
+        # Arrange
+        test_head = Coord({"x": 5, "y": 5})
+        test_body = tuple(Coord(p) for p in [{"x": 5, "y": 5}, {"x": 4, "y": 5}, {"x": 3, "y": 5}])
+
+        # Act
+        result_move = neck_direction(test_head, test_body)
+
+        # Assert
+        self.assertEqual(result_move, LEFT)
+
+    def test_neck_right(self):
+        # Arrange
+        test_head = Coord({"x": 5, "y": 5})
+        test_body = tuple(Coord(p) for p in [{"x": 5, "y": 5}, {"x": 6, "y": 5}, {"x": 7, "y": 5}])
+
+        # Act
+        result_move = neck_direction(test_head, test_body)
+
+        # Assert
+        self.assertEqual(result_move, RIGHT)
+
+    def test_neck_up(self):
+        # Arrange
+        test_head = Coord({"x": 5, "y": 5})
+        test_body = tuple(Coord(p) for p in [{"x": 5, "y": 5}, {"x": 5, "y": 6}, {"x": 5, "y": 7}])
+
+        # Act
+        result_move = neck_direction(test_head, test_body)
+
+        # Assert
+        self.assertEqual(result_move, UP)
+
+    def test_neck_down(self):
+        # Arrange
+        test_head = Coord({"x": 5, "y": 5})
+        test_body = tuple(Coord(p) for p in [{"x": 5, "y": 5}, {"x": 5, "y": 4}, {"x": 5, "y": 3}])
+
+        # Act
+        result_move = neck_direction(test_head, test_body)
+
+        # Assert
+        self.assertEqual(result_move, DOWN)
+
+class AvoidEdgeTest(unittest.TestCase):
+    def test_top_edge(self):
+        # Arrange
+        board = Board({'height': 11, 'width': 11})
+        test_head = Coord({"x": 5, "y": board.top_edge})
+
+        # Act
+        result_move = top_edge(test_head, board)
+
+        # Assert
+        self.assertEqual(result_move, UP)
+
+    def test_bottom_edge(self):
+        # Arrange
+        board = Board({'height': 11, 'width': 11})
+        test_head = Coord({"x": 5, "y": board.bottom_edge})
+
+        # Act
+        result_move = bottom_edge(test_head, board)
+
+        # Assert
+        self.assertEqual(result_move, DOWN)
+
+    def test_left_edge(self):
+        # Arrange
+        board = Board({'height': 11, 'width': 11})
+        test_head = Coord({"x": board.left_edge, "y": 5})
+
+        # Act
+        result_move = left_edge(test_head, board)
+
+        # Assert
+        self.assertEqual(result_move, LEFT)
+
+    def test_right_edge(self):
+        # Arrange
+        board = Board({'height': 11, 'width': 11})
+        test_head = Coord({"x": board.right_edge, "y": 5})
+
+        # Act
+        result_move = right_edge(test_head, board)
+
+        # Assert
+        self.assertEqual(result_move, RIGHT)
+
+class AvoidSelfTest(unittest.TestCase):
+    def test_up(self):
+        # Arrange
+        test_head = Coord({"x": 5, "y": 5})
+        test_body = (
+            Coord({"x": 5, "y": 5}),
+            Coord({"x": 5, "y": 6}),
+        )
+
+        # Act
+        result_moves = entire_body(test_head, test_body)
+
+        # Assert
+        self.assertEqual(result_moves, [UP])
+
+    def test_down(self):
+        # Arrange
+        test_head = Coord({"x": 5, "y": 5})
+        test_body = (
+            Coord({"x": 5, "y": 5}),
+            Coord({"x": 5, "y": 4}),
+        )
+
+        # Act
+        result_moves = entire_body(test_head, test_body)
+
+        # Assert
+        self.assertEqual(result_moves, [DOWN])
+
+    def test_left(self):
+        # Arrange
+        test_head = Coord({"x": 5, "y": 5})
+        test_body = (
+            Coord({"x": 5, "y": 5}),
+            Coord({"x": 4, "y": 5}),
+        )
+
+        # Act
+        result_moves = entire_body(test_head, test_body)
+
+        # Assert
+        self.assertEqual(result_moves, [LEFT])
+
+    def test_right(self):
+        # Arrange
+        test_head = Coord({"x": 5, "y": 5})
+        test_body = (
+            Coord({"x": 5, "y": 5}),
+            Coord({"x": 6, "y": 5}),
+        )
+
+        # Act
+        result_moves = entire_body(test_head, test_body)
+
+        # Assert
+        self.assertEqual(result_moves, [RIGHT])
 
 class ChooseMoveTest(unittest.TestCase):
     def test_choose_move(self):
