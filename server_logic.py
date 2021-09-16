@@ -146,7 +146,8 @@ def choose_move(data: dict) -> str:
 
     # TODO: Using information from 'data', make your Battlesnake move towards a piece of food on the board.
     
-    move = random.choice(list(available_moves))
+    weighted_moves = edge_moves(snake.head, board) & available_moves
+    move = list(weighted_moves)[0] if weighted_moves else random.choice(list(available_moves))
 
     # TODO: Explore new strategies for picking a move that are better than random.
 
