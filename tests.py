@@ -184,7 +184,7 @@ class AvoidSelfTest(unittest.TestCase):
         move = snake.get_body_directions()
 
         # Assert
-        self.assertEqual(move, [Move.up])
+        self.assertEqual(move, {Move.up})
 
     def test_down(self):
         # Arrange
@@ -202,7 +202,7 @@ class AvoidSelfTest(unittest.TestCase):
         move = snake.get_body_directions()
 
         # Assert
-        self.assertEqual(move, [Move.down])
+        self.assertEqual(move, {Move.down})
 
     def test_left(self):
         # Arrange
@@ -220,7 +220,7 @@ class AvoidSelfTest(unittest.TestCase):
         move = snake.get_body_directions()
 
         # Assert
-        self.assertEqual(move, [Move.left])
+        self.assertEqual(move, {Move.left})
 
     def test_right(self):
         # Arrange
@@ -238,7 +238,7 @@ class AvoidSelfTest(unittest.TestCase):
         move = snake.get_body_directions()
 
         # Assert
-        self.assertEqual(move, [Move.right])
+        self.assertEqual(move, {Move.right})
 
 class FoodTest(unittest.TestCase):
     def test_food_locations(self):

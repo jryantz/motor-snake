@@ -175,7 +175,7 @@ class Snake:
 
         return [x.get_xy() for x in self.body]
     
-    def get_body_directions(self) -> list:
+    def get_body_directions(self) -> set[str]:
         '''
         Use this function to rule out the possibility of running into any of the snake's body parts.
 
@@ -184,14 +184,33 @@ class Snake:
 
         body = self.get_body()
         
-        moves = []
+        moves: set[str] = set()
         if self.head.up in body:
-            moves.append(Move.up)
+            moves.add(Move.up)
         if self.head.down in body:
-            moves.append(Move.down)
+            moves.add(Move.down)
         if self.head.left in body:
-            moves.append(Move.left)
+            moves.add(Move.left)
         if self.head.right in body:
-            moves.append(Move.right)
+            moves.add(Move.right)
+
+        return moves
+
+    def get_food_directions(self, food: set[Coord]) -> set[str]:
+        '''
+        Use this function to rule out the possibility of eating unintentionally.
+
+        return: Set representing all moves where the snake would get food.
+        '''
+    
+        moves: set[str] = set()
+        if self.head.up in food:
+            moves.add(Move.up)
+        if self.head.down in food:
+            moves.add(Move.down)
+        if self.head.left in food:
+            moves.add(Move.left)
+        if self.head.right in food:
+            moves.add(Move.right)
 
         return moves

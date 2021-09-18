@@ -32,28 +32,7 @@ def get_deadly_moves(board: Board, snake: Snake) -> set[str]:
         *snake.get_body_directions(),
     }
 
-def get_avoid_food_moves(board: Board, snake: Snake) -> set[str]:
-    '''
-    Returns a set of every move that will feed the snake - these must be avoided.
-
-    return: Set representing all moves where the snake would get food.
-    '''
-
-    food = board.get_food()
-    
-    moves: set[str] = {}
-    if snake.head.up in food:
-        moves.add(Move.up)
-    if snake.head.down in food:
-        moves.add(Move.down)
-    if snake.head.left in food:
-        moves.add(Move.left)
-    if snake.head.right in food:
-        moves.add(Move.right)
-
-    return moves
-
-def get_goto_food_moves(board: Board, snake: Snake) -> set[str]:
+def get_food_moves(board: Board, snake: Snake) -> set[str]:
     '''
     Returns a dictionary of moves that will navigate the snake to food.
     
@@ -105,24 +84,24 @@ def choose_move(data: dict) -> str:
     # Get the distance to the nearest piece of food.
     # Then add 5% margin of error to the distance.
     nearest_food_distance = board.get_nearest_food_distance(snake.head)
-    nearest_food_distance = nearest_food_distance + (nearest_food_distance * 0.05)
+    #nearest_food_distance = nearest_food_distance + (nearest_food_distance * 0.05)
 
     recommended_moves: set[str] = available_moves
     # The snake loses 1 health with each move.
     # Therefore, if the health is less than or equal to the nearest food - start moving to it.
     if snake.health <= nearest_food_distance:
         # Make your Battlesnake move towards a piece of food on the board.
-        goto_food_moves = get_goto_food_moves(board, snake)
-        recommended_moves = set(recommended_moves) & set(goto_food_moves)
+        goto_food_moves = get_food_moves(board, snake)
+        recommended_moves = recommended_moves & goto_food_moves
     else:
         # Avoid food at all costs until necessary.
-        avoid_food_moves = get_avoid_food_moves(board, snake)
-        recommended_moves = set(recommended_moves) - set(avoid_food_moves)
+        avoid_food_moves = snake.get_food_directions(board.get_food())
+        recommended_moves = recommended_moves - avoid_food_moves
 
         # Make sure that there are still moves available.
         # If not, add back the avoided food moves so that the snake doesn't kill itself.
         if len(recommended_moves) == 0:
-            recommended_moves = set(available_moves)
+            recommended_moves = available_moves
 
     move = random.choice(list(recommended_moves))
 
