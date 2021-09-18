@@ -1,5 +1,7 @@
 from typing import List
 
+from scipy.spatial.distance import cdist
+
 class Move:
     up = 'up'
     down = 'down'
@@ -8,8 +10,14 @@ class Move:
 
 class Coord:
     def __init__(self, data):
-        self.x = data['x']
-        self.y = data['y']
+        if isinstance(data, dict):
+            self.x = data['x']
+            self.y = data['y']
+        elif isinstance(data, tuple):
+            self.x = data[0]
+            self.y = data[1]
+        else:
+            raise Exception('data must be dict or tuple')
 
         self.up = (self.x, self.y + 1)
         self.down = (self.x, self.y - 1)
@@ -29,6 +37,7 @@ class Board:
     def __init__(self, data):
         self.height = data['height']
         self.width = data['width']
+        self.food: tuple = tuple(Coord(x) for x in data['food'])
 
         self._top_edge = self.height - 1
         self._bottom_edge = 0
@@ -75,6 +84,54 @@ class Board:
         if head.x == self._right_edge:
             return Move.right
 
+    def get_food(self) -> List[tuple]:
+        '''
+        Use this function to get the location of all of the food on the board.
+
+        return: A list of tuples that contains all of the food on the board.
+        '''
+
+        return [x.get_xy() for x in self.food]
+
+    def get_nearest_food_distance(self, head: Coord) -> float:
+        '''
+        Use this function to get the nearest food to the snakes head.
+
+        return: The rough distance to the food.
+        '''
+
+        head = head.get_xy()
+        food = self.get_food()
+
+        # Check that there is food.
+        if len(food) <= 0:
+            return None
+
+        distances = cdist([head], food, metric='cityblock')
+        nearest = distances.min()
+
+        return nearest
+
+    def get_nearest_food_location(self, head: Coord) -> Coord:
+        '''
+        Use this function to get the nearest food to the snakes head.
+
+        return: The Coord representing where the nearest piece of food is.
+        '''
+
+        head = head.get_xy()
+        food = self.get_food()
+
+        # Check that there is food.
+        if len(food) <= 0:
+            return None
+
+        distances = cdist([head], food, metric='cityblock')
+        nearest_index = distances.argmin()
+        nearest = food[nearest_index]
+
+        return Coord(nearest)
+
 class Snake:
     def __init__(self, data):
         self.head: Coord = Coord(data['head'])
@@ -109,11 +166,11 @@ class Snake:
         if neck == self.head.right:
             return Move.right
 
-    def get_body(self) -> List[Coord]:
+    def get_body(self) -> List[tuple]:
         '''
         Use this function to get the location of all of the snake's body parts.
 
-        return: A Coord list that contains all of the points of the snakes body.
+        return: A list of tuples that contains all of the points of the snakes body.
         '''
 
         return [x.get_xy() for x in self.body]

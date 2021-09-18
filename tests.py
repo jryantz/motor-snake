@@ -12,7 +12,7 @@ in the folder where this file exists:
 
 import unittest
 
-from server_models import Move, Board, Snake
+from server_models import Coord, Move, Board, Snake
 from server_logic import choose_move
 
 class AvoidNeckTest(unittest.TestCase):
@@ -109,7 +109,7 @@ class AvoidNeckTest(unittest.TestCase):
 class AvoidEdgeTest(unittest.TestCase):
     def test_top_edge(self):
         # Arrange
-        board = Board({'height': 11, 'width': 11})
+        board = Board({'height': 11, 'width': 11, 'food': []})
         snake = Snake({
             'head': {'x': 5, 'y': 10},
             'body': [],
@@ -124,7 +124,7 @@ class AvoidEdgeTest(unittest.TestCase):
 
     def test_bottom_edge(self):
         # Arrange
-        board = Board({'height': 11, 'width': 11})
+        board = Board({'height': 11, 'width': 11, 'food': []})
         snake = Snake({
             'head': {'x': 5, 'y': 0},
             'body': [],
@@ -139,7 +139,7 @@ class AvoidEdgeTest(unittest.TestCase):
 
     def test_left_edge(self):
         # Arrange
-        board = Board({'height': 11, 'width': 11})
+        board = Board({'height': 11, 'width': 11, 'food': []})
         snake = Snake({
             'head': {'x': 0, 'y': 5},
             'body': [],
@@ -154,7 +154,7 @@ class AvoidEdgeTest(unittest.TestCase):
 
     def test_right_edge(self):
         # Arrange
-        board = Board({'height': 11, 'width': 11})
+        board = Board({'height': 11, 'width': 11, 'food': []})
         snake = Snake({
             'head': {'x': 10, 'y': 5},
             'body': [],
@@ -239,6 +239,332 @@ class AvoidSelfTest(unittest.TestCase):
 
         # Assert
         self.assertEqual(move, [Move.right])
+
+class FoodTest(unittest.TestCase):
+    def test_food_locations(self):
+        # Arrange
+        data = {
+            "game": {
+                "id": "game-00fe20da-94ad-11ea-bb37",
+                "ruleset": {
+                    "name": "standard",
+                    "version": "v.1.2.3"
+                },
+                "timeout": 500
+            },
+            "turn": 14,
+            "board": {
+                "height": 11,
+                "width": 11,
+                "food": [
+                    {"x": 5, "y": 5}, 
+                    {"x": 9, "y": 0}, 
+                    {"x": 2, "y": 6}
+                ],
+                "hazards": [
+                    {"x": 3, "y": 2}
+                ],
+                "snakes": [
+                    {
+                        "id": "snake-508e96ac-94ad-11ea-bb37",
+                        "name": "My Snake",
+                        "health": 54,
+                        "body": [
+                            {"x": 0, "y": 0}, 
+                            {"x": 1, "y": 0}, 
+                            {"x": 2, "y": 0}
+                        ],
+                        "latency": "111",
+                        "head": {"x": 0, "y": 0},
+                        "length": 3,
+                        "shout": "why are we shouting??",
+                        "squad": ""
+                    }, 
+                    {
+                        "id": "snake-b67f4906-94ae-11ea-bb37",
+                        "name": "Another Snake",
+                        "health": 16,
+                        "body": [
+                            {"x": 5, "y": 4}, 
+                            {"x": 5, "y": 3}, 
+                            {"x": 6, "y": 3},
+                            {"x": 6, "y": 2}
+                        ],
+                        "latency": "222",
+                        "head": {"x": 5, "y": 4},
+                        "length": 4,
+                        "shout": "I'm not really sure...",
+                        "squad": ""
+                    }
+                ]
+            },
+            "you": {
+                "id": "snake-508e96ac-94ad-11ea-bb37",
+                "name": "My Snake",
+                "health": 54,
+                "body": [
+                    {"x": 0, "y": 0}, 
+                    {"x": 1, "y": 0}, 
+                    {"x": 2, "y": 0}
+                ],
+                "latency": "111",
+                "head": {"x": 0, "y": 0},
+                "length": 3,
+                "shout": "why are we shouting??",
+                "squad": ""
+            }
+        }
+        board = Board(data['board'])
+
+        # Act
+        locations = board.get_food()
+
+        # Assert
+        self.assertEqual(locations, [
+            Coord({'x': 5, 'y': 5}).get_xy(),
+            Coord({'x': 9, 'y': 0}).get_xy(),
+            Coord({'x': 2, 'y': 6}).get_xy()
+        ])
+
+    def test_nearest_food_distance(self):
+        # Arrange
+        data = {
+            "game": {
+                "id": "game-00fe20da-94ad-11ea-bb37",
+                "ruleset": {
+                    "name": "standard",
+                    "version": "v.1.2.3"
+                },
+                "timeout": 500
+            },
+            "turn": 14,
+            "board": {
+                "height": 11,
+                "width": 11,
+                "food": [
+                    {"x": 5, "y": 5}, 
+                    {"x": 9, "y": 0}, 
+                    {"x": 2, "y": 6}
+                ],
+                "hazards": [
+                    {"x": 3, "y": 2}
+                ],
+                "snakes": [
+                    {
+                        "id": "snake-508e96ac-94ad-11ea-bb37",
+                        "name": "My Snake",
+                        "health": 54,
+                        "body": [
+                            {"x": 0, "y": 0}, 
+                            {"x": 1, "y": 0}, 
+                            {"x": 2, "y": 0}
+                        ],
+                        "latency": "111",
+                        "head": {"x": 0, "y": 0},
+                        "length": 3,
+                        "shout": "why are we shouting??",
+                        "squad": ""
+                    }, 
+                    {
+                        "id": "snake-b67f4906-94ae-11ea-bb37",
+                        "name": "Another Snake",
+                        "health": 16,
+                        "body": [
+                            {"x": 5, "y": 4}, 
+                            {"x": 5, "y": 3}, 
+                            {"x": 6, "y": 3},
+                            {"x": 6, "y": 2}
+                        ],
+                        "latency": "222",
+                        "head": {"x": 5, "y": 4},
+                        "length": 4,
+                        "shout": "I'm not really sure...",
+                        "squad": ""
+                    }
+                ]
+            },
+            "you": {
+                "id": "snake-508e96ac-94ad-11ea-bb37",
+                "name": "My Snake",
+                "health": 54,
+                "body": [
+                    {"x": 0, "y": 0}, 
+                    {"x": 1, "y": 0}, 
+                    {"x": 2, "y": 0}
+                ],
+                "latency": "111",
+                "head": {"x": 0, "y": 0},
+                "length": 3,
+                "shout": "why are we shouting??",
+                "squad": ""
+            }
+        }
+        board = Board(data['board'])
+
+        # Act
+        distance = board.get_nearest_food_distance(Coord({'x': 4, 'y': 4}))
+        distance = distance
+
+        # Assert
+        self.assertEqual(distance, 2)
+
+    def test_nearest_food_location_none(self):
+        # Arrange
+        data = {
+            "game": {
+                "id": "game-00fe20da-94ad-11ea-bb37",
+                "ruleset": {
+                    "name": "standard",
+                    "version": "v.1.2.3"
+                },
+                "timeout": 500
+            },
+            "turn": 14,
+            "board": {
+                "height": 11,
+                "width": 11,
+                "food": [],
+                "hazards": [
+                    {"x": 3, "y": 2}
+                ],
+                "snakes": [
+                    {
+                        "id": "snake-508e96ac-94ad-11ea-bb37",
+                        "name": "My Snake",
+                        "health": 54,
+                        "body": [
+                            {"x": 0, "y": 0}, 
+                            {"x": 1, "y": 0}, 
+                            {"x": 2, "y": 0}
+                        ],
+                        "latency": "111",
+                        "head": {"x": 0, "y": 0},
+                        "length": 3,
+                        "shout": "why are we shouting??",
+                        "squad": ""
+                    }, 
+                    {
+                        "id": "snake-b67f4906-94ae-11ea-bb37",
+                        "name": "Another Snake",
+                        "health": 16,
+                        "body": [
+                            {"x": 5, "y": 4}, 
+                            {"x": 5, "y": 3}, 
+                            {"x": 6, "y": 3},
+                            {"x": 6, "y": 2}
+                        ],
+                        "latency": "222",
+                        "head": {"x": 5, "y": 4},
+                        "length": 4,
+                        "shout": "I'm not really sure...",
+                        "squad": ""
+                    }
+                ]
+            },
+            "you": {
+                "id": "snake-508e96ac-94ad-11ea-bb37",
+                "name": "My Snake",
+                "health": 54,
+                "body": [
+                    {"x": 0, "y": 0}, 
+                    {"x": 1, "y": 0}, 
+                    {"x": 2, "y": 0}
+                ],
+                "latency": "111",
+                "head": {"x": 0, "y": 0},
+                "length": 3,
+                "shout": "why are we shouting??",
+                "squad": ""
+            }
+        }
+        board = Board(data['board'])
+
+        # Act
+        coord = board.get_nearest_food_location(Coord({'x': 4, 'y': 4}))
+
+        # Assert
+        self.assertEqual(coord, None)
+
+    def test_nearest_food_location(self):
+        # Arrange
+        data = {
+            "game": {
+                "id": "game-00fe20da-94ad-11ea-bb37",
+                "ruleset": {
+                    "name": "standard",
+                    "version": "v.1.2.3"
+                },
+                "timeout": 500
+            },
+            "turn": 14,
+            "board": {
+                "height": 11,
+                "width": 11,
+                "food": [
+                    {"x": 5, "y": 5}, 
+                    {"x": 9, "y": 0}, 
+                    {"x": 2, "y": 6}
+                ],
+                "hazards": [
+                    {"x": 3, "y": 2}
+                ],
+                "snakes": [
+                    {
+                        "id": "snake-508e96ac-94ad-11ea-bb37",
+                        "name": "My Snake",
+                        "health": 54,
+                        "body": [
+                            {"x": 0, "y": 0}, 
+                            {"x": 1, "y": 0}, 
+                            {"x": 2, "y": 0}
+                        ],
+                        "latency": "111",
+                        "head": {"x": 0, "y": 0},
+                        "length": 3,
+                        "shout": "why are we shouting??",
+                        "squad": ""
+                    }, 
+                    {
+                        "id": "snake-b67f4906-94ae-11ea-bb37",
+                        "name": "Another Snake",
+                        "health": 16,
+                        "body": [
+                            {"x": 5, "y": 4}, 
+                            {"x": 5, "y": 3}, 
+                            {"x": 6, "y": 3},
+                            {"x": 6, "y": 2}
+                        ],
+                        "latency": "222",
+                        "head": {"x": 5, "y": 4},
+                        "length": 4,
+                        "shout": "I'm not really sure...",
+                        "squad": ""
+                    }
+                ]
+            },
+            "you": {
+                "id": "snake-508e96ac-94ad-11ea-bb37",
+                "name": "My Snake",
+                "health": 54,
+                "body": [
+                    {"x": 0, "y": 0}, 
+                    {"x": 1, "y": 0}, 
+                    {"x": 2, "y": 0}
+                ],
+                "latency": "111",
+                "head": {"x": 0, "y": 0},
+                "length": 3,
+                "shout": "why are we shouting??",
+                "squad": ""
+            }
+        }
+        board = Board(data['board'])
+
+        # Act
+        coord = board.get_nearest_food_location(Coord({'x': 4, 'y': 4}))
+
+        # Assert
+        self.assertEqual(coord.get_xy(), Coord({'x': 5, 'y': 5}).get_xy())
 
 class ChooseMoveTest(unittest.TestCase):
     def test_choose_move(self):
