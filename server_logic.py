@@ -103,9 +103,9 @@ def choose_move(data: dict) -> str:
     # TODO: Using information from 'data', don't let your Battlesnake pick a move that would collide with another Battlesnake.
 
     # Get the distance to the nearest piece of food.
-    # Then add 30% margin of error to the distance.
+    # Then add 5% margin of error to the distance.
     nearest_food_distance = board.get_nearest_food_distance(snake.head)
-    nearest_food_distance = nearest_food_distance + (nearest_food_distance * 0.3)
+    nearest_food_distance = nearest_food_distance + (nearest_food_distance * 0.05)
 
     recommended_moves: set[str] = available_moves
     # The snake loses 1 health with each move.
