@@ -19,12 +19,13 @@ class AvoidNeckTest(unittest.TestCase):
     def test_neck_at_starting_position(self):
         # Arrange
         snake = Snake({
+            'head': {'x': 5, 'y': 5},
             'body': [
                 {'x': 5, 'y': 5}, 
                 {'x': 5, 'y': 5}, 
                 {'x': 5, 'y': 5}
             ],
-            'head': {'x': 5, 'y': 5}
+            'health': 95
         })
 
         # Act
@@ -36,12 +37,13 @@ class AvoidNeckTest(unittest.TestCase):
     def test_neck_up(self):
         # Arrange
         snake = Snake({
+            'head': {'x': 5, 'y': 5},
             'body': [
                 {'x': 5, 'y': 5}, 
                 {'x': 5, 'y': 6}, 
                 {'x': 5, 'y': 7}
             ],
-            'head': {'x': 5, 'y': 5}
+            'health': 95
         })
 
         # Act
@@ -53,12 +55,13 @@ class AvoidNeckTest(unittest.TestCase):
     def test_neck_down(self):
         # Arrange
         snake = Snake({
+            'head': {'x': 5, 'y': 5},
             'body': [
                 {'x': 5, 'y': 5}, 
                 {'x': 5, 'y': 4}, 
                 {'x': 5, 'y': 3}
             ],
-            'head': {'x': 5, 'y': 5}
+            'health': 95
         })
 
         # Act
@@ -70,12 +73,13 @@ class AvoidNeckTest(unittest.TestCase):
     def test_neck_left(self):
         # Arrange
         snake = Snake({
+            'head': {'x': 5, 'y': 5},
             'body': [
                 {'x': 5, 'y': 5}, 
                 {'x': 4, 'y': 5}, 
                 {'x': 3, 'y': 5}
             ],
-            'head': {'x': 5, 'y': 5}
+            'health': 95
         })
 
         # Act
@@ -87,12 +91,13 @@ class AvoidNeckTest(unittest.TestCase):
     def test_neck_right(self):
         # Arrange
         snake = Snake({
+            'head': {'x': 5, 'y': 5},
             'body': [
                 {'x': 5, 'y': 5}, 
                 {'x': 6, 'y': 5}, 
                 {'x': 7, 'y': 5}
             ],
-            'head': {'x': 5, 'y': 5}
+            'health': 95
         })
 
         # Act
@@ -107,7 +112,8 @@ class AvoidEdgeTest(unittest.TestCase):
         board = Board({'height': 11, 'width': 11})
         snake = Snake({
             'head': {'x': 5, 'y': 10},
-            'body': []
+            'body': [],
+            'health': 95
         })
 
         # Act
@@ -121,7 +127,8 @@ class AvoidEdgeTest(unittest.TestCase):
         board = Board({'height': 11, 'width': 11})
         snake = Snake({
             'head': {'x': 5, 'y': 0},
-            'body': []
+            'body': [],
+            'health': 95
         })
 
         # Act
@@ -135,7 +142,8 @@ class AvoidEdgeTest(unittest.TestCase):
         board = Board({'height': 11, 'width': 11})
         snake = Snake({
             'head': {'x': 0, 'y': 5},
-            'body': []
+            'body': [],
+            'health': 95
         })
 
         # Act
@@ -149,7 +157,8 @@ class AvoidEdgeTest(unittest.TestCase):
         board = Board({'height': 11, 'width': 11})
         snake = Snake({
             'head': {'x': 10, 'y': 5},
-            'body': []
+            'body': [],
+            'health': 95
         })
 
         # Act
@@ -162,12 +171,13 @@ class AvoidSelfTest(unittest.TestCase):
     def test_up(self):
         # Arrange
         snake = Snake({
+            'head': {'x': 5, 'y': 5},
             'body': [
                 {'x': 5, 'y': 5}, 
                 {'x': 5, 'y': 6}, 
                 {'x': 5, 'y': 7}
             ],
-            'head': {'x': 5, 'y': 5}
+            'health': 95
         })
 
         # Act
@@ -179,12 +189,13 @@ class AvoidSelfTest(unittest.TestCase):
     def test_down(self):
         # Arrange
         snake = Snake({
+            'head': {'x': 5, 'y': 5},
             'body': [
                 {'x': 5, 'y': 5}, 
                 {'x': 5, 'y': 4}, 
                 {'x': 5, 'y': 3}
             ],
-            'head': {'x': 5, 'y': 5}
+            'health': 95
         })
 
         # Act
@@ -196,12 +207,13 @@ class AvoidSelfTest(unittest.TestCase):
     def test_left(self):
         # Arrange
         snake = Snake({
+            'head': {'x': 5, 'y': 5},
             'body': [
                 {'x': 5, 'y': 5}, 
                 {'x': 4, 'y': 5}, 
                 {'x': 3, 'y': 5}
             ],
-            'head': {'x': 5, 'y': 5}
+            'health': 95
         })
 
         # Act
@@ -213,12 +225,13 @@ class AvoidSelfTest(unittest.TestCase):
     def test_right(self):
         # Arrange
         snake = Snake({
+            'head': {'x': 5, 'y': 5},
             'body': [
                 {'x': 5, 'y': 5}, 
                 {'x': 6, 'y': 5}, 
                 {'x': 7, 'y': 5}
             ],
-            'head': {'x': 5, 'y': 5}
+            'health': 95
         })
 
         # Act

@@ -77,8 +77,10 @@ class Board:
 
 class Snake:
     def __init__(self, data):
-        self.head = Coord(data['head'])
-        self.body = tuple(Coord(x) for x in data['body'])
+        self.head: Coord = Coord(data['head'])
+        self.body: tuple = tuple(Coord(x) for x in data['body'])
+        
+        self.health: int = data['health']
 
     def get_neck(self) -> Coord:
         '''
