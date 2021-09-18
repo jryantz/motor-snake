@@ -113,11 +113,16 @@ def choose_move(data: dict) -> str:
     if snake.health <= nearest_food_distance:
         # Make your Battlesnake move towards a piece of food on the board.
         goto_food_moves = get_goto_food_moves(board, snake)
-        recommended_moves = recommended_moves & goto_food_moves
+        recommended_moves = set(recommended_moves) & set(goto_food_moves)
     else:
         # Avoid food at all costs until necessary.
         avoid_food_moves = get_avoid_food_moves(board, snake)
         recommended_moves = set(recommended_moves) - set(avoid_food_moves)
+
+        # Make sure that there are still moves available.
+        # If not, add back the avoided food moves so that the snake doesn't kill itself.
+        if len(recommended_moves) == 0:
+            recommended_moves = set(available_moves)
 
     move = random.choice(list(recommended_moves))
 
