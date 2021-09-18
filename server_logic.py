@@ -1,5 +1,6 @@
 import random
-from typing import List, Dict, Tuple
+
+from server_models import Move, Board, Snake
 
 """
 This file can be a nice home for your move logic, and to write helper functions.
@@ -8,106 +9,7 @@ We have started this for you, with a function to help remove the 'neck' directio
 from the list of possible moves!
 """
 
-UP = 'up'
-DOWN = 'down'
-LEFT = 'left'
-RIGHT = 'right'
-
-POSSIBLE_MOVES = {UP, DOWN, LEFT, RIGHT}
-
-class Coord:
-    def __init__(self, data):
-        self.x = data['x']
-        self.y = data['y']
-
-        self.up = (self.x, self.y + 1)
-        self.down = (self.x, self.y - 1)
-        self.left = (self.x - 1, self.y)
-        self.right = (self.x + 1, self.y)
-    
-    def as_tuple(self) -> tuple:
-        return (self.x, self.y)
-
-class Board:
-    def __init__(self, data):
-        self.height = data['height']
-        self.width = data['width']
-
-        self.top_edge = self.height - 1
-        self.bottom_edge = 0
-        self.left_edge = 0
-        self.right_edge = self.width - 1
-
-class Snake:
-    def __init__(self, data):
-        self.head = Coord(data['head'])
-        self.body = tuple(Coord(c) for c in data['body'])
-
-def neck_direction(head: Coord, body: Tuple[Coord]):
-    neck = body[1].as_tuple()
-
-    if neck == head.up:
-        return UP
-    if neck == head.down:
-        return DOWN
-    if neck == head.left:
-        return LEFT
-    if neck == head.right:
-        return RIGHT
-
-def entire_body(head: Coord, body: Tuple[Coord]):
-    body_as_tuples = [p.as_tuple() for p in body]
-
-    deadly_moves = []
-
-    if head.up in body_as_tuples:
-        deadly_moves.append(UP)
-    if head.down in body_as_tuples:
-        deadly_moves.append(DOWN)
-    if head.left in body_as_tuples:
-        deadly_moves.append(LEFT)
-    if head.right in body_as_tuples:
-        deadly_moves.append(RIGHT)
-
-    return deadly_moves
-
-def top_edge(head: Coord, board: Board):
-    if head.y == board.top_edge:
-        return UP
-
-def bottom_edge(head: Coord, board: Board):
-    if head.y == board.bottom_edge:
-        return DOWN
-
-def left_edge(head: Coord, board: Board):
-    if head.x == board.left_edge:
-        return LEFT
-
-def right_edge(head: Coord, board: Board):
-    if head.x == board.right_edge:
-        return RIGHT
-
-def is_edge(coord: Tuple, board: Board):
-    return (
-        coord[1] == board.top_edge
-        or coord[1] == board.bottom_edge
-        or coord[0] == board.left_edge
-        or coord[0] == board.right_edge
-    )
-
-def edge_moves(head: Coord, board: Board):
-    moves = []
-
-    if is_edge(head.up, board):
-        moves.append(UP)
-    if is_edge(head.down, board):
-        moves.append(DOWN)
-    if is_edge(head.left, board):
-        moves.append(LEFT)
-    if is_edge(head.right, board):
-        moves.append(RIGHT)
-
-    return {m for m in moves}
+POSSIBLE_MOVES = {Move.up, Move.down, Move.left, Move.right}
 
 def choose_move(data: dict) -> str:
     '''
@@ -128,16 +30,16 @@ def choose_move(data: dict) -> str:
 
     deadly_moves = {
         # Don't let your Battlesnake move beyond the edges of the board.
-        top_edge(snake.head, board),
-        bottom_edge(snake.head, board),
-        left_edge(snake.head, board),
-        right_edge(snake.head, board),
+        board.check_top_edge(snake.head),
+        board.check_bottom_edge(snake.head),
+        board.check_left_edge(snake.head),
+        board.check_right_edge(snake.head),
 
         # Don't let your Battlesnake pick a move that would go back on itself.
-        neck_direction(snake.head, snake.body),
+        snake.get_neck_direction(),
 
         # Don't let your Battlesnake pick a move that would hit its own body.
-        *entire_body(snake.head, snake.body),
+        *snake.get_body_directions(),
     }
 
     available_moves = possible_moves - deadly_moves

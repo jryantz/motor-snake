@@ -6,9 +6,7 @@ from flask import request
 
 import server_logic
 
-
 app = Flask(__name__)
-
 
 @app.get("/")
 def handle_info():
@@ -24,12 +22,11 @@ def handle_info():
     print("INFO")
     return {
         "apiversion": "1",
-        "author": "jryantz",  # TODO: Your Battlesnake Username
+        "author": "jryantz", # TODO: Your Battlesnake Username
         "color": "#007AFD",  # TODO: Personalize
-        "head": "evil",  # TODO: Personalize
-        "tail": "hook",  # TODO: Personalize
+        "head": "evil",      # TODO: Personalize
+        "tail": "hook",      # TODO: Personalize
     }
-
 
 @app.post("/start")
 def handle_start():
@@ -41,7 +38,6 @@ def handle_start():
 
     print(f"{data['game']['id']} START")
     return "ok"
-
 
 @app.post("/move")
 def handle_move():
@@ -56,7 +52,6 @@ def handle_move():
 
     return {"move": move}
 
-
 @app.post("/end")
 def end():
     """
@@ -67,7 +62,6 @@ def end():
 
     print(f"{data['game']['id']} END")
     return "ok"
-
 
 if __name__ == "__main__":
     logging.getLogger("werkzeug").setLevel(logging.ERROR)

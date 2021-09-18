@@ -8,174 +8,228 @@ To run the unit tests, use the following command in your terminal,
 in the folder where this file exists:
 
     python tests.py -v
-
 """
 
 import unittest
 
-from server_logic import POSSIBLE_MOVES, UP, DOWN, LEFT, RIGHT, Coord, Board
-from server_logic import neck_direction, top_edge, bottom_edge, left_edge, right_edge, entire_body, choose_move
+from server_models import Move, Board, Snake
+from server_logic import choose_move
 
 class AvoidNeckTest(unittest.TestCase):
     def test_neck_at_starting_position(self):
         # Arrange
-        test_head = Coord({"x": 5, "y": 5})
-        test_body = tuple(Coord(p) for p in [{"x": 5, "y": 5}, {"x": 5, "y": 5}, {"x": 5, "y": 5}])
+        snake = Snake({
+            'body': [
+                {'x': 5, 'y': 5}, 
+                {'x': 5, 'y': 5}, 
+                {'x': 5, 'y': 5}
+            ],
+            'head': {'x': 5, 'y': 5}
+        })
 
         # Act
-        result_move = neck_direction(test_head, test_body)
+        move = snake.get_neck_direction()
 
         # Assert
-        self.assertEqual(result_move, None)
-
-    def test_neck_left(self):
-        # Arrange
-        test_head = Coord({"x": 5, "y": 5})
-        test_body = tuple(Coord(p) for p in [{"x": 5, "y": 5}, {"x": 4, "y": 5}, {"x": 3, "y": 5}])
-
-        # Act
-        result_move = neck_direction(test_head, test_body)
-
-        # Assert
-        self.assertEqual(result_move, LEFT)
-
-    def test_neck_right(self):
-        # Arrange
-        test_head = Coord({"x": 5, "y": 5})
-        test_body = tuple(Coord(p) for p in [{"x": 5, "y": 5}, {"x": 6, "y": 5}, {"x": 7, "y": 5}])
-
-        # Act
-        result_move = neck_direction(test_head, test_body)
-
-        # Assert
-        self.assertEqual(result_move, RIGHT)
+        self.assertEqual(move, None)
 
     def test_neck_up(self):
         # Arrange
-        test_head = Coord({"x": 5, "y": 5})
-        test_body = tuple(Coord(p) for p in [{"x": 5, "y": 5}, {"x": 5, "y": 6}, {"x": 5, "y": 7}])
+        snake = Snake({
+            'body': [
+                {'x': 5, 'y': 5}, 
+                {'x': 5, 'y': 6}, 
+                {'x': 5, 'y': 7}
+            ],
+            'head': {'x': 5, 'y': 5}
+        })
 
         # Act
-        result_move = neck_direction(test_head, test_body)
+        move = snake.get_neck_direction()
 
         # Assert
-        self.assertEqual(result_move, UP)
-
+        self.assertEqual(move, Move.up)
+    
     def test_neck_down(self):
         # Arrange
-        test_head = Coord({"x": 5, "y": 5})
-        test_body = tuple(Coord(p) for p in [{"x": 5, "y": 5}, {"x": 5, "y": 4}, {"x": 5, "y": 3}])
+        snake = Snake({
+            'body': [
+                {'x': 5, 'y': 5}, 
+                {'x': 5, 'y': 4}, 
+                {'x': 5, 'y': 3}
+            ],
+            'head': {'x': 5, 'y': 5}
+        })
 
         # Act
-        result_move = neck_direction(test_head, test_body)
+        move = snake.get_neck_direction()
 
         # Assert
-        self.assertEqual(result_move, DOWN)
+        self.assertEqual(move, Move.down)
+
+    def test_neck_left(self):
+        # Arrange
+        snake = Snake({
+            'body': [
+                {'x': 5, 'y': 5}, 
+                {'x': 4, 'y': 5}, 
+                {'x': 3, 'y': 5}
+            ],
+            'head': {'x': 5, 'y': 5}
+        })
+
+        # Act
+        move = snake.get_neck_direction()
+
+        # Assert
+        self.assertEqual(move, Move.left)
+
+    def test_neck_right(self):
+        # Arrange
+        snake = Snake({
+            'body': [
+                {'x': 5, 'y': 5}, 
+                {'x': 6, 'y': 5}, 
+                {'x': 7, 'y': 5}
+            ],
+            'head': {'x': 5, 'y': 5}
+        })
+
+        # Act
+        move = snake.get_neck_direction()
+
+        # Assert
+        self.assertEqual(move, Move.right)
 
 class AvoidEdgeTest(unittest.TestCase):
     def test_top_edge(self):
         # Arrange
         board = Board({'height': 11, 'width': 11})
-        test_head = Coord({"x": 5, "y": board.top_edge})
+        snake = Snake({
+            'head': {'x': 5, 'y': 10},
+            'body': []
+        })
 
         # Act
-        result_move = top_edge(test_head, board)
+        move = board.check_top_edge(snake.head)
 
         # Assert
-        self.assertEqual(result_move, UP)
+        self.assertEqual(move, Move.up)
 
     def test_bottom_edge(self):
         # Arrange
         board = Board({'height': 11, 'width': 11})
-        test_head = Coord({"x": 5, "y": board.bottom_edge})
+        snake = Snake({
+            'head': {'x': 5, 'y': 0},
+            'body': []
+        })
 
         # Act
-        result_move = bottom_edge(test_head, board)
+        move = board.check_bottom_edge(snake.head)
 
         # Assert
-        self.assertEqual(result_move, DOWN)
+        self.assertEqual(move, Move.down)
 
     def test_left_edge(self):
         # Arrange
         board = Board({'height': 11, 'width': 11})
-        test_head = Coord({"x": board.left_edge, "y": 5})
+        snake = Snake({
+            'head': {'x': 0, 'y': 5},
+            'body': []
+        })
 
         # Act
-        result_move = left_edge(test_head, board)
+        move = board.check_left_edge(snake.head)
 
         # Assert
-        self.assertEqual(result_move, LEFT)
+        self.assertEqual(move, Move.left)
 
     def test_right_edge(self):
         # Arrange
         board = Board({'height': 11, 'width': 11})
-        test_head = Coord({"x": board.right_edge, "y": 5})
+        snake = Snake({
+            'head': {'x': 10, 'y': 5},
+            'body': []
+        })
 
         # Act
-        result_move = right_edge(test_head, board)
+        move = board.check_right_edge(snake.head)
 
         # Assert
-        self.assertEqual(result_move, RIGHT)
+        self.assertEqual(move, Move.right)
 
 class AvoidSelfTest(unittest.TestCase):
     def test_up(self):
         # Arrange
-        test_head = Coord({"x": 5, "y": 5})
-        test_body = (
-            Coord({"x": 5, "y": 5}),
-            Coord({"x": 5, "y": 6}),
-        )
+        snake = Snake({
+            'body': [
+                {'x': 5, 'y': 5}, 
+                {'x': 5, 'y': 6}, 
+                {'x': 5, 'y': 7}
+            ],
+            'head': {'x': 5, 'y': 5}
+        })
 
         # Act
-        result_moves = entire_body(test_head, test_body)
+        move = snake.get_body_directions()
 
         # Assert
-        self.assertEqual(result_moves, [UP])
+        self.assertEqual(move, [Move.up])
 
     def test_down(self):
         # Arrange
-        test_head = Coord({"x": 5, "y": 5})
-        test_body = (
-            Coord({"x": 5, "y": 5}),
-            Coord({"x": 5, "y": 4}),
-        )
+        snake = Snake({
+            'body': [
+                {'x': 5, 'y': 5}, 
+                {'x': 5, 'y': 4}, 
+                {'x': 5, 'y': 3}
+            ],
+            'head': {'x': 5, 'y': 5}
+        })
 
         # Act
-        result_moves = entire_body(test_head, test_body)
+        move = snake.get_body_directions()
 
         # Assert
-        self.assertEqual(result_moves, [DOWN])
+        self.assertEqual(move, [Move.down])
 
     def test_left(self):
         # Arrange
-        test_head = Coord({"x": 5, "y": 5})
-        test_body = (
-            Coord({"x": 5, "y": 5}),
-            Coord({"x": 4, "y": 5}),
-        )
+        snake = Snake({
+            'body': [
+                {'x': 5, 'y': 5}, 
+                {'x': 4, 'y': 5}, 
+                {'x': 3, 'y': 5}
+            ],
+            'head': {'x': 5, 'y': 5}
+        })
 
         # Act
-        result_moves = entire_body(test_head, test_body)
+        move = snake.get_body_directions()
 
         # Assert
-        self.assertEqual(result_moves, [LEFT])
+        self.assertEqual(move, [Move.left])
 
     def test_right(self):
         # Arrange
-        test_head = Coord({"x": 5, "y": 5})
-        test_body = (
-            Coord({"x": 5, "y": 5}),
-            Coord({"x": 6, "y": 5}),
-        )
+        snake = Snake({
+            'body': [
+                {'x': 5, 'y': 5}, 
+                {'x': 6, 'y': 5}, 
+                {'x': 7, 'y': 5}
+            ],
+            'head': {'x': 5, 'y': 5}
+        })
 
         # Act
-        result_moves = entire_body(test_head, test_body)
+        move = snake.get_body_directions()
 
         # Assert
-        self.assertEqual(result_moves, [RIGHT])
+        self.assertEqual(move, [Move.right])
 
 class ChooseMoveTest(unittest.TestCase):
     def test_choose_move(self):
+        # Arrange
         data = {
             "game": {
                 "id": "game-00fe20da-94ad-11ea-bb37",
@@ -198,37 +252,37 @@ class ChooseMoveTest(unittest.TestCase):
                     {"x": 3, "y": 2}
                 ],
                 "snakes": [
-                {
-                    "id": "snake-508e96ac-94ad-11ea-bb37",
-                    "name": "My Snake",
-                    "health": 54,
-                    "body": [
-                        {"x": 0, "y": 0}, 
-                        {"x": 1, "y": 0}, 
-                        {"x": 2, "y": 0}
-                    ],
-                    "latency": "111",
-                    "head": {"x": 0, "y": 0},
-                    "length": 3,
-                    "shout": "why are we shouting??",
-                    "squad": ""
-                }, 
-                {
-                    "id": "snake-b67f4906-94ae-11ea-bb37",
-                    "name": "Another Snake",
-                    "health": 16,
-                    "body": [
-                        {"x": 5, "y": 4}, 
-                        {"x": 5, "y": 3}, 
-                        {"x": 6, "y": 3},
-                        {"x": 6, "y": 2}
-                    ],
-                    "latency": "222",
-                    "head": {"x": 5, "y": 4},
-                    "length": 4,
-                    "shout": "I'm not really sure...",
-                    "squad": ""
-                }
+                    {
+                        "id": "snake-508e96ac-94ad-11ea-bb37",
+                        "name": "My Snake",
+                        "health": 54,
+                        "body": [
+                            {"x": 0, "y": 0}, 
+                            {"x": 1, "y": 0}, 
+                            {"x": 2, "y": 0}
+                        ],
+                        "latency": "111",
+                        "head": {"x": 0, "y": 0},
+                        "length": 3,
+                        "shout": "why are we shouting??",
+                        "squad": ""
+                    }, 
+                    {
+                        "id": "snake-b67f4906-94ae-11ea-bb37",
+                        "name": "Another Snake",
+                        "health": 16,
+                        "body": [
+                            {"x": 5, "y": 4}, 
+                            {"x": 5, "y": 3}, 
+                            {"x": 6, "y": 3},
+                            {"x": 6, "y": 2}
+                        ],
+                        "latency": "222",
+                        "head": {"x": 5, "y": 4},
+                        "length": 4,
+                        "shout": "I'm not really sure...",
+                        "squad": ""
+                    }
                 ]
             },
             "you": {
@@ -248,9 +302,11 @@ class ChooseMoveTest(unittest.TestCase):
             }
         }
 
+        # Act
         result = choose_move(data)
 
-        self.assertIn(result, POSSIBLE_MOVES)
+        # Assert
+        self.assertIn(result, [Move.up, Move.down, Move.left, Move.right])
 
 if __name__ == "__main__":
     unittest.main()
