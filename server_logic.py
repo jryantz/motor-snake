@@ -32,7 +32,28 @@ def get_deadly_moves(board: Board, snake: Snake) -> set[str]:
         *snake.get_body_directions(),
     }
 
-def get_food_moves(board: Board, snake: Snake) -> set[str]:
+def get_avoid_food_moves(board: Board, snake: Snake) -> set[str]:
+    '''
+    Returns a set of every move that will feed the snake - these must be avoided.
+
+    return: Set representing all moves where the snake would get food.
+    '''
+
+    food = board.get_food()
+    
+    moves: set[str] = {}
+    if snake.head.up in food:
+        moves.add(Move.up)
+    if snake.head.down in food:
+        moves.add(Move.down)
+    if snake.head.left in food:
+        moves.add(Move.left)
+    if snake.head.right in food:
+        moves.add(Move.right)
+
+    return moves
+
+def get_goto_food_moves(board: Board, snake: Snake) -> set[str]:
     '''
     Returns a dictionary of moves that will navigate the snake to food.
     
@@ -41,37 +62,24 @@ def get_food_moves(board: Board, snake: Snake) -> set[str]:
     return: Dictionary representing any move that would get the snake to food.
     '''
 
-    # The list of moves to make to get to the nearest piece of food.
+    nearest_food_location = board.get_nearest_food_location(snake.head)
+    
     moves: set[str] = {}
+    # If the head is to the left of the food, move right.
+    if snake.head.x < nearest_food_location.x:
+        moves.add(Move.right)
+    # If the head is to the right of the food, move left.
+    if snake.head.x > nearest_food_location.x:
+        moves.add(Move.left)
+    # If the head is above the food, move down.
+    if snake.head.y > nearest_food_location.y:
+        moves.add(Move.down)
+    # If the head is below the food, move up.
+    if snake.head.y < nearest_food_location.y:
+        moves.add(Move.up)
 
-    # Get the distance to the nearest piece of food.
-    nearest_food_distance = board.get_nearest_food_distance(snake.head)
-    # Add a 30% margin of error to the distance.
-    nearest_food_distance = nearest_food_distance + (nearest_food_distance * 0.3)
-
-    # The snake loses 1 health with each move.
-    # Therefore, if the health is less than or equal to the nearest food - start moving to it.
-    if snake.health <= nearest_food_distance:
-        nearest_food_location = board.get_nearest_food_location(snake.head)
-        
-        # If the head is to the left of the food, move right.
-        if snake.head.x < nearest_food_location.x:
-            moves.add(Move.right)
-        # If the head is to the right of the food, move left.
-        if snake.head.x > nearest_food_location.x:
-            moves.add(Move.left)
-        # If the head is above the food, move down.
-        if snake.head.y > nearest_food_location.y:
-            moves.add(Move.down)
-        # If the head is below the food, move up.
-        if snake.head.y < nearest_food_location.y:
-            moves.add(Move.up)
-
-        # Return the list of possible moves that will get the snake to the food.
-        return moves
-
-    # If the snake has no need to get food, then return a list of every possible move.
-    return POSSIBLE_MOVES
+    # Return the list of possible moves that will get the snake to the food.
+    return moves
 
 def choose_move(data: dict) -> str:
     '''
@@ -94,13 +102,23 @@ def choose_move(data: dict) -> str:
 
     # TODO: Using information from 'data', don't let your Battlesnake pick a move that would collide with another Battlesnake.
 
-    # Make your Battlesnake move towards a piece of food on the board.
-    food_moves = get_food_moves(board, snake)
-    
-    # Get a set of all recommended moves with the intersection.
-    # If moving to food isn't necessary, then food_moves will contain a list of every possible move.
-    # With every possible move, this negates the effect of the food_moves set by returning just the available moves.
-    recommended_moves = available_moves & food_moves
+    # Get the distance to the nearest piece of food.
+    # Then add 30% margin of error to the distance.
+    nearest_food_distance = board.get_nearest_food_distance(snake.head)
+    nearest_food_distance = nearest_food_distance + (nearest_food_distance * 0.3)
+
+    recommended_moves: set[str] = available_moves
+    # The snake loses 1 health with each move.
+    # Therefore, if the health is less than or equal to the nearest food - start moving to it.
+    if snake.health <= nearest_food_distance:
+        # Make your Battlesnake move towards a piece of food on the board.
+        goto_food_moves = get_goto_food_moves(board, snake)
+        recommended_moves = recommended_moves & goto_food_moves
+    else:
+        # Avoid food at all costs until necessary.
+        avoid_food_moves = get_avoid_food_moves(board, snake)
+        recommended_moves = set(recommended_moves) - set(avoid_food_moves)
+
     move = random.choice(list(recommended_moves))
 
     # TODO: Explore new strategies for picking a move that are better than random.
